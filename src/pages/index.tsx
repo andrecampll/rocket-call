@@ -1,5 +1,9 @@
+import { Heading } from "@rocket-ui/react";
+
 export default function Home() {
   return (
-    <div><h1>Rocket Call</h1></div>
+    <div>
+      <Heading as="h1">Hello</Heading>
+    </div>
   )
 }
