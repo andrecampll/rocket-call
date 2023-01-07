@@ -1,4 +1,4 @@
-import { Heading } from "@rocket-ui/react";
+import { Heading } from '@rocket-ui/react'
 
 export default function Home() {
   return (
