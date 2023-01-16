@@ -3,6 +3,8 @@ import Image from 'next/image'
 
 import previewImage from '../../assets/app-preview.png'
 
+import { ClaimUserNameForm } from './components/ClaimUserNameForm'
+
 import * as S from './styles'
 
 export default function Home() {
@@ -16,6 +18,8 @@ export default function Home() {
           Connect your calendar and let people book appointments in your free
           time.
         </Text>
+
+        <ClaimUserNameForm />
       </S.Hero>
 
       <S.Preview>
