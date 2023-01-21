@@ -1,6 +1,7 @@
+import { useCallback } from 'react'
+import { useRouter } from 'next/router'
 import { Button, Text, TextInput } from '@rocket-ui/react'
 import { ArrowRight } from 'phosphor-react'
-import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -25,14 +26,21 @@ export const ClaimUserNameForm = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ClaimUsernameFormData>({
     resolver: zodResolver(claimUsernameSchema),
   })
 
-  const handleClaimUsername = useCallback((data: ClaimUsernameFormData) => {
-    console.log(data)
-  }, [])
+  const router = useRouter()
+
+  const handleClaimUsername = useCallback(
+    async (data: ClaimUsernameFormData) => {
+      const { username } = data
+
+      await router.push(`/register?username=${username}`)
+    },
+    [router],
+  )
 
   return (
     <>
@@ -43,7 +51,7 @@ export const ClaimUserNameForm = () => {
           placeholder="your-username"
           {...register('username')}
         />
-        <Button size="sm" type="submit">
+        <Button size="sm" type="submit" disabled={isSubmitting}>
           Submit
           <ArrowRight />
         </Button>

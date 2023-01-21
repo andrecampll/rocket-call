@@ -1,3 +1,5 @@
+import { useCallback, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { Button, Heading, MultiStep, Text, TextInput } from '@rocket-ui/react'
 import { useForm } from 'react-hook-form'
 import { ArrowRight } from 'phosphor-react'
@@ -27,14 +29,23 @@ export default function Register() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   })
 
-  const handleRegister = async (data: RegisterFormData) => {
+  const router = useRouter()
+
+  useEffect(() => {
+    if (router.query.username) {
+      setValue('username', String(router.query.username))
+    }
+  }, [router.query.username, setValue])
+
+  const handleRegister = useCallback(async (data: RegisterFormData) => {
     console.log(data)
-  }
+  }, [])
 
   return (
     <S.Wrapper>
