@@ -11,10 +11,10 @@ import * as S from './styles'
 const claimUsernameSchema = z.object({
   username: z
     .string()
-    .min(3, { message: 'Username must be at least 3 characters' })
+    .min(3, { message: 'Username must be at least 3 characters.' })
     .max(20)
     .regex(/^([a-z\\-]+)$/i, {
-      message: 'Username can only contain letters and dashes',
+      message: 'Username can only contain letters and dashes.',
     })
     .transform((value) => value.toLowerCase()),
 })
