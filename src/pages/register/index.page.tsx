@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Button, Heading, MultiStep, Text, TextInput } from '@rocket-ui/react'
 import { useForm } from 'react-hook-form'
+import { AxiosError } from 'axios'
 import { ArrowRight } from 'phosphor-react'
 
 import { z } from 'zod'
@@ -52,7 +53,12 @@ export default function Register() {
         username: data.username,
       })
     } catch (err) {
-      console.log(err)
+      if (err instanceof AxiosError && err.response?.data.message) {
+        alert(err.response.data.message)
+        return
+      }
+
+      console.error(err)
     }
   }, [])
 
