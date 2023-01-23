@@ -7,6 +7,8 @@ import { ArrowRight } from 'phosphor-react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { api } from '../../lib/axios'
+
 import * as S from './styles'
 
 const registerFormSchema = z.object({
@@ -44,7 +46,14 @@ export default function Register() {
   }, [router.query.username, setValue])
 
   const handleRegister = useCallback(async (data: RegisterFormData) => {
-    console.log(data)
+    try {
+      await api.post('/users', {
+        name: data.name,
+        username: data.username,
+      })
+    } catch (err) {
+      console.log(err)
+    }
   }, [])
 
   return (
