@@ -46,21 +46,26 @@ export default function Register() {
     }
   }, [router.query.username, setValue])
 
-  const handleRegister = useCallback(async (data: RegisterFormData) => {
-    try {
-      await api.post('/users', {
-        name: data.name,
-        username: data.username,
-      })
-    } catch (err) {
-      if (err instanceof AxiosError && err.response?.data.message) {
-        alert(err.response.data.message)
-        return
-      }
+  const handleRegister = useCallback(
+    async (data: RegisterFormData) => {
+      try {
+        await api.post('/users', {
+          name: data.name,
+          username: data.username,
+        })
 
-      console.error(err)
-    }
-  }, [])
+        await router.push('/register/connect-calendar')
+      } catch (err) {
+        if (err instanceof AxiosError && err.response?.data.message) {
+          alert(err.response.data.message)
+          return
+        }
+
+        console.error(err)
+      }
+    },
+    [router],
+  )
 
   return (
     <S.Wrapper>
@@ -70,35 +75,35 @@ export default function Register() {
           We need some information to create your profile! Oh, you can edit this
           information later.
         </Text>
-
-        <MultiStep size={4} currentStep={1} />
-
-        <S.Form as="form" onSubmit={handleSubmit(handleRegister)}>
-          <label>
-            <Text size="sm">Username</Text>
-            <TextInput
-              prefix="ignite.com/"
-              placeholder="your-username"
-              {...register('username')}
-            />
-            {errors.username && (
-              <S.FormError size="sm">{errors.username.message}</S.FormError>
-            )}
-          </label>
-
-          <label>
-            <Text size="sm">Full name</Text>
-            <TextInput placeholder="Your name" {...register('name')} />
-            {errors.name && (
-              <S.FormError size="sm">{errors.name.message}</S.FormError>
-            )}
-          </label>
-
-          <Button type="submit" disabled={isSubmitting}>
-            Next <ArrowRight />
-          </Button>
-        </S.Form>
       </S.Header>
+
+      <MultiStep size={4} currentStep={1} />
+
+      <S.Form as="form" onSubmit={handleSubmit(handleRegister)}>
+        <label>
+          <Text size="sm">Username</Text>
+          <TextInput
+            prefix="ignite.com/"
+            placeholder="your-username"
+            {...register('username')}
+          />
+          {errors.username && (
+            <S.FormError size="sm">{errors.username.message}</S.FormError>
+          )}
+        </label>
+
+        <label>
+          <Text size="sm">Full name</Text>
+          <TextInput placeholder="Your name" {...register('name')} />
+          {errors.name && (
+            <S.FormError size="sm">{errors.name.message}</S.FormError>
+          )}
+        </label>
+
+        <Button type="submit" disabled={isSubmitting}>
+          Next <ArrowRight />
+        </Button>
+      </S.Form>
     </S.Wrapper>
   )
 }
