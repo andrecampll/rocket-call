@@ -1,15 +1,20 @@
-// import { useCallback } from 'react'
+import { useCallback } from 'react'
 import { Button, Heading, MultiStep, Text } from '@rocket-ui/react'
-import { signIn } from 'next-auth/react'
-import { ArrowRight } from 'phosphor-react'
+import { signIn, useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import { ArrowRight, Check } from 'phosphor-react'
 
 import * as S from '../styles'
 import * as LS from './styles'
 
 export default function Register() {
-  // const handleRegister = useCallback(async () => {
+  const session = useSession()
+  const router = useRouter()
 
-  // }, [])
+  const hasAuthError = !!router.query.error
+  const isSignedIn = session.status === 'authenticated'
+
+  const handleConnectCalendar = useCallback(async () => signIn('google'), [])
 
   return (
     <S.Wrapper>
@@ -26,16 +31,30 @@ export default function Register() {
       <LS.ConnectBox>
         <LS.ConnectItem>
           <Text>Google Calendar</Text>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => signIn('google')}
-          >
-            Conectar <ArrowRight />
-          </Button>
+          {isSignedIn ? (
+            <Button size="sm" disabled>
+              Connected
+              <Check />
+            </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleConnectCalendar}
+            >
+              Connect <ArrowRight />
+            </Button>
+          )}
         </LS.ConnectItem>
 
-        <Button type="submit">
+        {hasAuthError && (
+          <LS.AuthError size="sm">
+            Error while trying to connect with Google. Check if you have allowed
+            the app to access your calendar.
+          </LS.AuthError>
+        )}
+
+        <Button type="submit" disabled={!isSignedIn}>
           Next <ArrowRight />
         </Button>
       </LS.ConnectBox>
