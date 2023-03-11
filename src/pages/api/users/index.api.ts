@@ -31,7 +31,7 @@ export default async function handler(
     },
   })
 
-  setCookie({ res }, '@rocket-call:user', user.id, {
+  setCookie({ res }, '@rocket-call:userId', user.id, {
     maxAge: COOKIES_MAX_AGE, // 7 days
     path: '/',
   })
