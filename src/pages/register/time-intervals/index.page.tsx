@@ -7,79 +7,65 @@ import {
   TextInput,
 } from '@rocket-ui/react'
 import { ArrowRight } from 'phosphor-react'
-import { useCallback } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useCallback, useMemo } from 'react'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+
+import { days } from '../../../utils/days'
 import { getWeekDays } from '../../../utils/get-week-days'
 
 import * as S from '../styles'
 import * as LS from './styles'
 
-const timeIntervalSchema = z.object({})
+const timeIntervalSchema = z.object({
+  intervals: z
+    .array(
+      z.object({
+        weekDay: z.number().int().min(0).max(6),
+        enabled: z.boolean(),
+        startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+        endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+      }),
+    )
+    .length(7)
+    .transform((intervals) => intervals.filter((interval) => interval.enabled))
+    .refine((intervals) => intervals.length > 0, {
+      message: 'You must select at least one week day',
+    }),
+})
+
+type TimeIntervalsFormData = z.infer<typeof timeIntervalSchema>
 
 export default function TimeIntervals() {
   const {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { isSubmitting, errors },
   } = useForm({
+    resolver: zodResolver(timeIntervalSchema),
     defaultValues: {
-      intervals: [
-        {
-          weekDay: 0,
-          enabled: false,
-          startTime: '08:00',
-          endTime: '18:00',
-        },
-        {
-          weekDay: 1,
-          enabled: true,
-          startTime: '08:00',
-          endTime: '18:00',
-        },
-        {
-          weekDay: 2,
-          enabled: true,
-          startTime: '08:00',
-          endTime: '18:00',
-        },
-        {
-          weekDay: 3,
-          enabled: true,
-          startTime: '08:00',
-          endTime: '18:00',
-        },
-        {
-          weekDay: 4,
-          enabled: true,
-          startTime: '08:00',
-          endTime: '18:00',
-        },
-        {
-          weekDay: 5,
-          enabled: true,
-          startTime: '08:00',
-          endTime: '18:00',
-        },
-        {
-          weekDay: 6,
-          enabled: false,
-          startTime: '08:00',
-          endTime: '18:00',
-        },
-      ],
+      intervals: days,
     },
   })
 
-  const weekDays = getWeekDays()
+  const weekDays = useMemo(() => getWeekDays(), [])
+
+  const intervals = watch('intervals')
 
   const { fields } = useFieldArray({
     control,
     name: 'intervals',
   })
 
-  const handleSetTimeIntervals = useCallback(async () => {}, [])
+  const handleSetTimeIntervals = useCallback(
+    async (data: TimeIntervalsFormData) => {
+      console.log(data)
+    },
+    [],
+  )
 
   return (
     <S.Wrapper>
@@ -97,7 +83,18 @@ export default function TimeIntervals() {
           {fields.map((field, index) => (
             <LS.Interval key={field.id}>
               <LS.IntervalDay>
-                <Checkbox />
+                <Controller
+                  name={`intervals.${index}.enabled`}
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked === true)
+                      }
+                      checked={field.value}
+                    />
+                  )}
+                />
                 <Text>{weekDays[field.weekDay]}</Text>
               </LS.IntervalDay>
               <LS.IntervalInputs>
@@ -105,6 +102,7 @@ export default function TimeIntervals() {
                   size="sm"
                   type="time"
                   step={60}
+                  disabled={intervals[index].enabled === false}
                   {...register(`intervals.${index}.startTime`)}
                 />
 
@@ -112,6 +110,7 @@ export default function TimeIntervals() {
                   size="sm"
                   type="time"
                   step={60}
+                  disabled={intervals[index].enabled === false}
                   {...register(`intervals.${index}.endTime`)}
                 />
               </LS.IntervalInputs>
@@ -119,7 +118,11 @@ export default function TimeIntervals() {
           ))}
         </LS.IntervalsContainer>
 
-        <Button type="submit">
+        {errors.intervals && (
+          <LS.FormError size="sm">{errors.intervals.message}</LS.FormError>
+        )}
+
+        <Button type="submit" disabled={isSubmitting}>
           Next <ArrowRight />
         </Button>
       </LS.IntervalBox>
