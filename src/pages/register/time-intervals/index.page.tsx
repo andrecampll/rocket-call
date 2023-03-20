@@ -17,6 +17,7 @@ import { getWeekDays } from '../../../utils/get-week-days'
 
 import * as S from '../styles'
 import * as LS from './styles'
+import { convertTimeStringToMinutes } from '../../../utils/convert-time-string-to-minutes'
 
 const timeIntervalSchema = z.object({
   intervals: z
@@ -32,10 +33,29 @@ const timeIntervalSchema = z.object({
     .transform((intervals) => intervals.filter((interval) => interval.enabled))
     .refine((intervals) => intervals.length > 0, {
       message: 'You must select at least one week day',
-    }),
+    })
+    .transform((intervals) =>
+      intervals.map((interval) => ({
+        weekDay: interval.weekDay,
+        startTimeInMinutes: convertTimeStringToMinutes(interval.startTime),
+        endTimeInMinutes: convertTimeStringToMinutes(interval.endTime),
+      })),
+    )
+    .refine(
+      (intervals) =>
+        intervals.every(
+          (interval) =>
+            interval.endTimeInMinutes - 60 >= interval.startTimeInMinutes,
+        ),
+      {
+        message: 'The minimum interval is 1 hour',
+      },
+    ),
 })
 
-type TimeIntervalsFormData = z.infer<typeof timeIntervalSchema>
+type TimeIntervalsFormInput = z.input<typeof timeIntervalSchema>
+
+type TimeIntervalsFormOutput = z.output<typeof timeIntervalSchema>
 
 export default function TimeIntervals() {
   const {
@@ -44,7 +64,7 @@ export default function TimeIntervals() {
     control,
     watch,
     formState: { isSubmitting, errors },
-  } = useForm({
+  } = useForm<TimeIntervalsFormInput>({
     resolver: zodResolver(timeIntervalSchema),
     defaultValues: {
       intervals: days,
@@ -60,12 +80,10 @@ export default function TimeIntervals() {
     name: 'intervals',
   })
 
-  const handleSetTimeIntervals = useCallback(
-    async (data: TimeIntervalsFormData) => {
-      console.log(data)
-    },
-    [],
-  )
+  const handleSetTimeIntervals = useCallback(async (data: any) => {
+    const formData = data as TimeIntervalsFormOutput
+    console.log(formData)
+  }, [])
 
   return (
     <S.Wrapper>
