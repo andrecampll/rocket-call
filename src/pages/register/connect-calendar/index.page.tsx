@@ -16,6 +16,10 @@ export default function ConnectCalendar() {
 
   const handleConnectCalendar = useCallback(async () => signIn('google'), [])
 
+  const handleNavigateToNextStep = useCallback(async () => {
+    await router.push('/register/time-intervals')
+  }, [router])
+
   return (
     <S.Wrapper>
       <S.Header>
@@ -54,7 +58,11 @@ export default function ConnectCalendar() {
           </LS.AuthError>
         )}
 
-        <Button type="submit" disabled={!isSignedIn}>
+        <Button
+          onClick={handleNavigateToNextStep}
+          type="submit"
+          disabled={!isSignedIn}
+        >
           Next <ArrowRight />
         </Button>
       </LS.ConnectBox>
