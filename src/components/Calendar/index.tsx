@@ -33,7 +33,29 @@ export const Calendar = () => {
           </tr>
         </thead>
         <tbody>
-          <tr></tr>
+          <tr>
+            <td>
+              <S.CalendarDay disabled>1</S.CalendarDay>
+            </td>
+            <td>
+              <S.CalendarDay>2</S.CalendarDay>
+            </td>
+            <td>
+              <S.CalendarDay>3</S.CalendarDay>
+            </td>
+            <td>
+              <S.CalendarDay>4</S.CalendarDay>
+            </td>
+            <td>
+              <S.CalendarDay>5</S.CalendarDay>
+            </td>
+            <td>
+              <S.CalendarDay>6</S.CalendarDay>
+            </td>
+            <td>
+              <S.CalendarDay>7</S.CalendarDay>
+            </td>
+          </tr>
         </tbody>
       </S.CalendarBody>
     </S.CalendarContainer>

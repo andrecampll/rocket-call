@@ -1,8 +1,8 @@
 type GetWeekDaysParams = {
-  short: boolean
+  short?: boolean
 }
 
-export function getWeekDays({ short = false }: GetWeekDaysParams) {
+export function getWeekDays({ short = false }: GetWeekDaysParams = {}) {
   const formatter = new Intl.DateTimeFormat('en', { weekday: 'long' })
 
   return Array.from(Array(7).keys())
