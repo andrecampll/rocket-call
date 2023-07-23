@@ -3,6 +3,7 @@ import { Avatar, Heading, Text } from '@rocket-ui/react'
 import { prisma } from '../../../lib/prisma'
 
 import * as S from './styles'
+import { ScheduleForm } from './ScheduleForm'
 
 type ScheduleProps = {
   user: {
@@ -20,6 +21,8 @@ export default function Schedule({ user }: ScheduleProps) {
         <Heading>{user.name}</Heading>
         <Text>{user.bio}</Text>
       </S.UserHeader>
+
+      <ScheduleForm />
     </S.Wrapper>
   )
 }
