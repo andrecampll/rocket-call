@@ -1,24 +1,46 @@
+import { useCallback, useMemo, useState } from 'react'
 import { CaretLeft, CaretRight } from 'phosphor-react'
 
 import * as S from './styles'
 import { getWeekDays } from '../../utils/get-week-days'
+import dayjs from 'dayjs'
 
 export const Calendar = () => {
+  const [currentDate, setCurrentDate] = useState(() => dayjs().set('date', 1))
+
+  const handlePreviousMonth = useCallback(() => {
+    const dateOnPreviousMonth = currentDate.subtract(1, 'month')
+
+    setCurrentDate(dateOnPreviousMonth)
+  }, [currentDate])
+
+  const handleNextMonth = useCallback(() => {
+    const dateOnNextMonth = currentDate.add(1, 'month')
+
+    setCurrentDate(dateOnNextMonth)
+  }, [currentDate])
+
   const shortWeekDays = getWeekDays({
     short: true,
   })
 
+  const currentMonth = useMemo(() => currentDate.format('MMMM'), [currentDate])
+
+  const currentYear = useMemo(() => currentDate.format('YYYY'), [currentDate])
+
   return (
     <S.CalendarContainer>
       <S.CalendarHeader>
-        <S.CalendarTitle>December 2023</S.CalendarTitle>
+        <S.CalendarTitle>
+          {currentMonth} <span>{currentYear}</span>
+        </S.CalendarTitle>
 
         <S.CalendarActions>
-          <button>
+          <button onClick={handlePreviousMonth} title="Previous month">
             <CaretLeft />
           </button>
 
-          <button>
+          <button onClick={handleNextMonth} title="Next month">
             <CaretRight />
           </button>
         </S.CalendarActions>
