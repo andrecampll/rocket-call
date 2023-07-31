@@ -1,17 +1,31 @@
+import { useMemo, useState } from 'react'
+
 import { Calendar } from '../../../../../components/Calendar'
 import * as S from './styles'
+import dayjs from 'dayjs'
 
 export const CalendarStep = () => {
-  const isDateSelected = false
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+
+  const isDateSelected = !!selectedDate
+
+  const weekDay = useMemo(
+    () => (selectedDate ? dayjs(selectedDate).format('dddd') : null),
+    [selectedDate],
+  )
+  const describedDate = useMemo(
+    () => (selectedDate ? dayjs(selectedDate).format('DD[ of ] MMMM') : null),
+    [selectedDate],
+  )
 
   return (
     <S.Container isTimePickerOpen={isDateSelected}>
-      <Calendar />
+      <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
       {isDateSelected && (
         <S.TimePicker>
           <S.TimePickerHeader>
-            tuesday <span>20th September</span>
+            {weekDay} <span>{describedDate}</span>
           </S.TimePickerHeader>
 
           <S.TimePickerList>
