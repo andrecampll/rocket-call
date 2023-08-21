@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { Calendar } from '../../../../../components/Calendar'
@@ -12,7 +12,11 @@ type Availability = {
   availableTimes: number[]
 }
 
-export const CalendarStep = () => {
+type CalendarStepProps = {
+  onSelectDateTime: (date: Date) => void
+}
+
+export const CalendarStep = ({ onSelectDateTime }: CalendarStepProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const router = useRouter()
 
@@ -49,6 +53,18 @@ export const CalendarStep = () => {
     },
   )
 
+  const handleSelectTime = useCallback(
+    (hour: string) => {
+      const dateTime = dayjs(selectedDate)
+        .set('hour', Number(hour))
+        .startOf('hour')
+        .toDate()
+
+      onSelectDateTime(dateTime)
+    },
+    [onSelectDateTime, selectedDate],
+  )
+
   return (
     <S.Container isTimePickerOpen={isDateSelected}>
       <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
@@ -63,6 +79,7 @@ export const CalendarStep = () => {
             {availability?.possibleTimes.map((hour) => (
               <S.TimePickerItem
                 key={hour}
+                onClick={() => handleSelectTime(String(hour))}
                 disabled={!availability.availableTimes.includes(hour)}
               >
                 {String(hour).padStart(2, '0')}:00h
