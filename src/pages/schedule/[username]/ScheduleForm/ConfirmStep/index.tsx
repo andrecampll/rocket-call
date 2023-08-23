@@ -1,11 +1,15 @@
-import { Button, Text, TextArea, TextInput } from '@rocket-ui/react'
-import * as S from './styles'
+import { useCallback, useMemo } from 'react'
 import { CalendarBlank, Clock } from 'phosphor-react'
-import { z } from 'zod'
+import { Button, Text, TextArea, TextInput } from '@rocket-ui/react'
+import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
+
+import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo } from 'react'
 import dayjs from 'dayjs'
+import { api } from '../../../../../lib/axios'
+
+import * as S from './styles'
 
 const confirmFormSchema = z.object({
   name: z.string().min(3, { message: 'Name must have at least 3 characters' }),
@@ -17,12 +21,12 @@ type ConfirmFormData = z.infer<typeof confirmFormSchema>
 
 type ConfirmStepProps = {
   schedulingDate: Date
-  onCancelConfirmation: () => void
+  toggleConfirmationStep: () => void
 }
 
 export const ConfirmStep = ({
   schedulingDate,
-  onCancelConfirmation,
+  toggleConfirmationStep,
 }: ConfirmStepProps) => {
   const {
     register,
@@ -32,9 +36,24 @@ export const ConfirmStep = ({
     resolver: zodResolver(confirmFormSchema),
   })
 
-  const handleConfirmScheduling = (data: ConfirmFormData) => {
-    console.log(data)
-  }
+  const router = useRouter()
+  const username = String(router.query.username)
+
+  const handleConfirmScheduling = useCallback(
+    async (data: ConfirmFormData) => {
+      const { name, email, observations } = data
+
+      await api.post(`/users/${username}/schedule`, {
+        name,
+        email,
+        observations,
+        date: schedulingDate,
+      })
+
+      toggleConfirmationStep()
+    },
+    [username, schedulingDate, toggleConfirmationStep],
+  )
 
   const describedDate = useMemo(
     () => dayjs(schedulingDate).format('DD[ of ]MMMM[ of ]YYYY'),
@@ -84,7 +103,11 @@ export const ConfirmStep = ({
       </label>
 
       <S.FormActions>
-        <Button type="button" variant="tertiary" onClick={onCancelConfirmation}>
+        <Button
+          type="button"
+          variant="tertiary"
+          onClick={toggleConfirmationStep}
+        >
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting}>
